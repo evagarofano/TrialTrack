@@ -1,14 +1,14 @@
 @TrialTrack_HostAddress = http://localhost:5011
 
-GET {{TrialTrack_HostAddress}}/studies
-Accept: application/json
-
-###
-
-GET {{TrialTrack_HostAddress}}/studies/1
-Accept: application/json
-
-###
+#GET {{TrialTrack_HostAddress}}/studies
+#Accept: application/json
+#
+####
+#
+#GET {{TrialTrack_HostAddress}}/studies/1
+#Accept: application/json
+#
+####
 
 POST {{TrialTrack_HostAddress}}/studies
 Content-Type: application/json
@@ -19,5 +19,20 @@ Accept: application/json
   "protocolNumber": "DB-003",
   "status": "Planning"
 }
+###
+
+POST {{TrialTrack_HostAddress}}/studies
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Heart Health Study",
+  "protocolNumber": "CV-001",
+  "status": "Recruiting"
+}
 
 ###
+
+### Get all studies
+GET {{TrialTrack_HostAddress}}/studies
+Accept: application/json

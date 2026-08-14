@@ -1,10 +1,19 @@
 using TrialTrack.Models;
 using TrialTrack.Dtos;
+using Microsoft.EntityFrameworkCore;
+using TrialTrack.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddDbContext<TrialTrackDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("TrialTrack")
+    )
+);
 
 var app = builder.Build();
 
@@ -16,33 +25,36 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var studies = new List<Study>
-{
-    new Study
-    {
-        Id = 1,
-        Name = "Heart Health Study",
-        ProtocolNumber = "CV-001",
-        Status = "Planning"
-    },
-    new Study
-    {
-        Id = 2,
-        Name = "Weight Management Study",
-        ProtocolNumber = "WM-002",
-        Status = "Recruiting"
-    }
-};
+//Commented as DB linked up
+// var studies = new List<Study>
+// {
+//     new Study
+//     {
+//         Id = 1,
+//         Name = "Heart Health Study",
+//         ProtocolNumber = "CV-001",
+//         Status = "Planning"
+//     },
+//     new Study
+//     {
+//         Id = 2,
+//         Name = "Weight Management Study",
+//         ProtocolNumber = "WM-002",
+//         Status = "Recruiting"
+//     }
+// };
 
-app.MapGet("/studies", () =>
+app.MapGet("/studies", async (TrialTrackDbContext db) =>
 {
-    return studies;
+    var studies = await db.Studies.ToListAsync();
+
+    return Results.Ok(studies);
 });
 
-app.MapGet("/studies/{id}", (int id) =>
+app.MapGet("/studies/{id}", async (int id, TrialTrackDbContext db) =>
 {
-    var study = studies.FirstOrDefault(s => s.Id == id);
-    
+    var study = await db.Studies.FindAsync(id);
+
     if (study is null)
     {
         return Results.NotFound();
@@ -51,17 +63,18 @@ app.MapGet("/studies/{id}", (int id) =>
     return Results.Ok(study);
 });
 
-app.MapPost("/studies", (CreateStudyDto dto) =>
+app.MapPost("/studies", async (CreateStudyDto dto, TrialTrackDbContext db) =>
 {
     var newStudy = new Study
     {
-        Id = studies.Count + 1,
         Name = dto.Name,
         ProtocolNumber = dto.ProtocolNumber,
         Status = dto.Status
     };
-    
-    studies.Add(newStudy);
+
+    db.Studies.Add(newStudy);
+
+    await db.SaveChangesAsync();
 
     return Results.Created($"/studies/{newStudy.Id}", newStudy);
 });
