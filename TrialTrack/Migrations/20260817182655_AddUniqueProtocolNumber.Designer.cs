@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrialTrack.Data;
 
@@ -10,9 +11,11 @@ using TrialTrack.Data;
 namespace TrialTrack.Migrations
 {
     [DbContext(typeof(TrialTrackDbContext))]
-    partial class TrialTrackDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260817182655_AddUniqueProtocolNumber")]
+    partial class AddUniqueProtocolNumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

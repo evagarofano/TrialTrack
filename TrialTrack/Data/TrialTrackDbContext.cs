@@ -11,4 +11,11 @@ public class TrialTrackDbContext : DbContext
     }
 
     public DbSet<Study> Studies { get; set; }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Study>()
+            .HasIndex(study => study.ProtocolNumber)
+            .IsUnique();
+    }
 }

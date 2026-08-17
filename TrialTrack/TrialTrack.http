@@ -33,6 +33,89 @@ Accept: application/json
 
 ###
 
-### Get all studies
-GET {{TrialTrack_HostAddress}}/studies
+### Update study 1
+PUT {{TrialTrack_HostAddress}}/studies/1
+Content-Type: application/json
 Accept: application/json
+
+{
+  "name": "Diabetes Study",
+  "protocolNumber": "DB-003",
+  "status": "Recruiting"
+}
+
+### 
+DELETE {{TrialTrack_HostAddress}}/studies/10
+Accept: application/json
+
+### Get all studies
+GET {{TrialTrack_HostAddress}}/studies/
+Accept: application/json
+
+### Test: missing name - should return 400
+POST {{TrialTrack_HostAddress}}/studies
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "",
+  "protocolNumber": "TEST-001",
+  "status": "Planning"
+}
+
+###
+
+### Test: invalid status - should return 400
+POST {{TrialTrack_HostAddress}}/studies
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test Study",
+  "protocolNumber": "TEST-001",
+  "status": "Banana"
+}
+
+### Delete duplicate studies
+
+DELETE {{TrialTrack_HostAddress}}/studies/2
+
+###
+
+DELETE {{TrialTrack_HostAddress}}/studies/3
+
+###
+
+DELETE {{TrialTrack_HostAddress}}/studies/4
+
+###
+
+DELETE {{TrialTrack_HostAddress}}/studies/6
+
+###
+
+DELETE {{TrialTrack_HostAddress}}/studies/7
+
+###
+
+DELETE {{TrialTrack_HostAddress}}/studies/8
+
+###
+
+DELETE {{TrialTrack_HostAddress}}/studies/9
+
+###
+
+DELETE {{TrialTrack_HostAddress}}/studies/11
+
+###
+
+DELETE {{TrialTrack_HostAddress}}/studies/12
+
+###
+
+DELETE {{TrialTrack_HostAddress}}/studies/13
+
+###
+
+DELETE {{TrialTrack_HostAddress}}/studies/14
