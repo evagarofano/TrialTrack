@@ -2,6 +2,7 @@ using TrialTrack.Models;
 using TrialTrack.Dtos;
 using Microsoft.EntityFrameworkCore;
 using TrialTrack.Data;
+using TrialTrack.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,8 @@ builder.Services.AddDbContext<TrialTrackDbContext>(options =>
         builder.Configuration.GetConnectionString("TrialTrack")
     )
 );
+
+builder.Services.AddScoped<StudyService>();
 
 var app = builder.Build();
 
@@ -44,26 +47,28 @@ app.UseHttpsRedirection();
 //     }
 // };
 
-app.MapGet("/studies", async (TrialTrackDbContext db) =>
+app.MapGet("/studies", async (StudyService studyService) =>
 {
-    var studies = await db.Studies.ToListAsync();
+    var studies = await studyService.GetStudiesAsync();
 
     return Results.Ok(studies);
 });
 
-app.MapGet("/studies/{id}", async (int id, TrialTrackDbContext db) =>
+app.MapGet("/studies/{id}", async (int id, StudyService studyService) =>
 {
-    var study = await db.Studies.FindAsync(id);
+    var study = await studyService.GetStudyByIdAsync(id);
 
     if (study is null)
     {
         return Results.NotFound();
     }
-
+    
     return Results.Ok(study);
 });
 
-app.MapPost("/studies", async (CreateStudyDto dto, TrialTrackDbContext db) =>
+app.MapPost("/studies", async (
+    CreateStudyDto dto,
+    StudyService studyService) =>
 {
     if (string.IsNullOrWhiteSpace(dto.Name) ||
         string.IsNullOrWhiteSpace(dto.ProtocolNumber) ||
@@ -79,59 +84,41 @@ app.MapPost("/studies", async (CreateStudyDto dto, TrialTrackDbContext db) =>
         return Results.BadRequest("Status must be Planning, Recruiting, Active or Closed.");
     }
     
-    var protocolExists = await db.Studies
-        .AnyAsync(s => s.ProtocolNumber == dto.ProtocolNumber);
-
+    var protocolExists =
+        await studyService.ProtocolNumberExistsAsync(dto.ProtocolNumber);
+    
     if (protocolExists)
     {
         return Results.BadRequest(
             "A study with this protocol number already exists.");
     }
     
-    var newStudy = new Study
-    {
-        Name = dto.Name,
-        ProtocolNumber = dto.ProtocolNumber,
-        Status = dto.Status
-    };
-    
-    db.Studies.Add(newStudy);
+    var study = await studyService.CreateStudyAsync(dto);
 
-    await db.SaveChangesAsync();
-
-    return Results.Created($"/studies/{newStudy.Id}", newStudy);
+    return Results.Created($"/studies/{study.Id}", study);
 });
 
-app.MapPut("/studies/{id}", async (int id, UpdateStudyDto dto, TrialTrackDbContext db) =>
+app.MapPut("/studies/{id}", async (int id, UpdateStudyDto dto, StudyService studyService) =>
 {
-    var study = await db.Studies.FindAsync(id);
+    var study = await studyService.UpdateStudyAsync(id, dto);
 
     if (study is null)
     {
         return Results.NotFound();
     }
-
-    study.Name = dto.Name;
-    study.Status = dto.Status;
-
-    await db.SaveChangesAsync();
 
     return Results.Ok(study);
 });
 
-app.MapDelete("/studies/{id}", async (int id, TrialTrackDbContext db) =>
+app.MapDelete("/studies/{id}", async (int id, StudyService studyService) =>
 {
-    var study = await db.Studies.FindAsync(id);
-
-    if (study is null)
+    var deleted = await studyService.DeleteStudyAsync(id);
+    
+    if (!deleted)
     {
         return Results.NotFound();
     }
-
-    db.Studies.Remove(study);
-
-    await db.SaveChangesAsync();
-
+    
     return Results.NoContent();
 });
 

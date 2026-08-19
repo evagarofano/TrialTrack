@@ -45,7 +45,7 @@ Accept: application/json
 }
 
 ### 
-DELETE {{TrialTrack_HostAddress}}/studies/10
+DELETE {{TrialTrack_HostAddress}}/studies/16
 Accept: application/json
 
 ### Get all studies
@@ -72,50 +72,6 @@ Accept: application/json
 
 {
   "name": "Test Study",
-  "protocolNumber": "TEST-001",
-  "status": "Banana"
+  "protocolNumber": "TEST-PIG",
+  "status": "Planning"
 }
-
-### Delete duplicate studies
-
-DELETE {{TrialTrack_HostAddress}}/studies/2
-
-###
-
-DELETE {{TrialTrack_HostAddress}}/studies/3
-
-###
-
-DELETE {{TrialTrack_HostAddress}}/studies/4
-
-###
-
-DELETE {{TrialTrack_HostAddress}}/studies/6
-
-###
-
-DELETE {{TrialTrack_HostAddress}}/studies/7
-
-###
-
-DELETE {{TrialTrack_HostAddress}}/studies/8
-
-###
-
-DELETE {{TrialTrack_HostAddress}}/studies/9
-
-###
-
-DELETE {{TrialTrack_HostAddress}}/studies/11
-
-###
-
-DELETE {{TrialTrack_HostAddress}}/studies/12
-
-###
-
-DELETE {{TrialTrack_HostAddress}}/studies/13
-
-###
-
-DELETE {{TrialTrack_HostAddress}}/studies/14
