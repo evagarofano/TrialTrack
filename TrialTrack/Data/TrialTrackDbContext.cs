@@ -11,6 +11,7 @@ public class TrialTrackDbContext : DbContext
     }
 
     public DbSet<Study> Studies { get; set; }
+    public DbSet<Site> Sites { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

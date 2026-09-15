@@ -43,6 +43,7 @@ public class StudyService
     public async Task<Study?> GetStudyByIdAsync(int id)
     {
         return await _db.Studies.FindAsync(id);
+        ;
     }
     
     public async Task<Study?> UpdateStudyAsync(int id, UpdateStudyDto dto)

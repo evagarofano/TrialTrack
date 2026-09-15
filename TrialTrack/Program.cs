@@ -17,6 +17,7 @@ builder.Services.AddDbContext<TrialTrackDbContext>(options =>
 );
 
 builder.Services.AddScoped<StudyService>();
+builder.Services.AddScoped<SiteService>();
 
 var app = builder.Build();
 
@@ -98,6 +99,34 @@ app.MapPost("/studies", async (
     return Results.Created($"/studies/{study.Id}", study);
 });
 
+app.MapPost("/sites", async (
+    CreateSiteDto dto,
+    StudyService studyService,
+    SiteService siteService
+) =>
+{
+    
+    var study = await studyService.GetStudyByIdAsync(dto.StudyId);
+
+    if (study is null)
+    {
+        return Results.NotFound();
+    }
+
+    var newSite = await siteService.CreateSiteAsync(dto);
+
+    return Results.Created(
+        $"/sites/{newSite.Id}",
+        new
+        {
+            newSite.Id,
+            newSite.Name,
+            newSite.Location,
+            newSite.Status,
+            newSite.StudyId
+        });
+});
+
 app.MapPut("/studies/{id}", async (int id, UpdateStudyDto dto, StudyService studyService) =>
 {
     var study = await studyService.UpdateStudyAsync(id, dto);
@@ -120,6 +149,75 @@ app.MapDelete("/studies/{id}", async (int id, StudyService studyService) =>
     }
     
     return Results.NoContent();
+});
+
+app.MapGet("/sites/{id}", async (int id, SiteService siteService) =>
+{
+    var site = await siteService.GetSiteByIdAsync(id);
+
+    if (site is null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(site);
+});
+
+app.MapGet("/sites", async (SiteService siteService) =>
+{
+    var sites = await siteService.GetSitesAsync();
+
+    return Results.Ok(sites);
+});
+
+
+app.MapPut("/sites/{id}", async (
+    int id,
+    UpdateSiteDto dto,
+    SiteService siteService) =>
+{
+    if (string.IsNullOrWhiteSpace(dto.Name) ||
+        string.IsNullOrWhiteSpace(dto.Location) ||
+        string.IsNullOrWhiteSpace(dto.Status))
+    {
+        return Results.BadRequest(
+            "Name, Location and Status are required.");
+    }
+
+    var allowedStatuses = new[]
+    {
+        "Pending", "Awarded", "Recruiting", "Active", "Closed"
+    };
+
+    if (!allowedStatuses.Contains(dto.Status))
+    {
+        return Results.BadRequest(
+            "Status must be Pending, Awarded, Recruiting, Active or Closed.");
+    }
+
+    var site = await siteService.UpdateSiteAsync(id, dto);
+
+    if (site is null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(site);
+});
+
+app.MapDelete("/sites/{id}", async (
+    int id,
+    SiteService siteService) =>
+{
+    var deleted = await siteService.DeleteSiteAsync(id);
+
+    if (!deleted)
+    {
+        return Results.NotFound();
+    }
+    
+    return Results.NoContent();
+
 });
 
 app.Run();

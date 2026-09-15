@@ -75,3 +75,33 @@ Accept: application/json
   "protocolNumber": "TEST-PIG",
   "status": "Planning"
 }
+
+###
+POST http://localhost:5011/sites
+Content-Type: application/json
+
+{
+  "name": "Edinburgh Research Site",
+  "location": "Edinburgh",
+  "status": "Active",
+  "studyId": 1
+}
+
+###
+GET http://localhost:5011/sites
+
+###
+GET http://localhost:5011/sites/999
+
+###
+PUT http://localhost:5011/sites/999
+Content-Type: application/json
+
+{
+  "name": "Glasgow Research Site",
+  "location": "Glasgow City Centre",
+  "status": "Recruiting"
+}
+
+###
+DELETE http://localhost:5011/sites/8
