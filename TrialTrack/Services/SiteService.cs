@@ -72,4 +72,6 @@ public class SiteService
 
         return true;
     }
+    
+    public List<Subject> Subjects { get; set; } = new();
 }

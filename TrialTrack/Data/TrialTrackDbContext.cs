@@ -12,11 +12,18 @@ public class TrialTrackDbContext : DbContext
 
     public DbSet<Study> Studies { get; set; }
     public DbSet<Site> Sites { get; set; }
-    
+
+    public DbSet<Subject> Subjects { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Study>()
             .HasIndex(study => study.ProtocolNumber)
             .IsUnique();
+        
+        modelBuilder.Entity<Subject>()
+            .HasIndex(subject => subject.SubjectNumber)
+            .IsUnique();
     }
+
 }

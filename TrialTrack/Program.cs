@@ -18,6 +18,7 @@ builder.Services.AddDbContext<TrialTrackDbContext>(options =>
 
 builder.Services.AddScoped<StudyService>();
 builder.Services.AddScoped<SiteService>();
+builder.Services.AddScoped<SubjectService>();
 
 var app = builder.Build();
 
@@ -218,6 +219,85 @@ app.MapDelete("/sites/{id}", async (
     
     return Results.NoContent();
 
+});
+
+app.MapPost("/subjects", async (
+    CreateSubjectDto dto,
+    SubjectService subjectService,
+    SiteService siteService
+) =>
+{
+    
+    if (dto.SiteId <= 0 ||
+        string.IsNullOrWhiteSpace(dto.SubjectNumber) ||
+        string.IsNullOrWhiteSpace(dto.RecruitmentStatus))
+    {
+        return Results.BadRequest("SiteId, Subject Number and Recruitment Status are required.");
+    }
+        
+    var allowedStatuses = new[]
+    {
+        "Pre-Screened", 
+        "Screening",
+        "Randomised",
+        "Screen Failed",
+        "Completed",
+        "Withdrawn"
+    };
+    
+    if (!allowedStatuses.Contains(dto.RecruitmentStatus))
+    {
+        return Results.BadRequest(
+            "Recruitment Status must be Pre-Screened, Screening, Randomised, Screen Failed, Completed or Withdrawn.");
+    }
+    
+    var site = await siteService.GetSiteByIdAsync(dto.SiteId);
+    
+    if (site is null)
+    {
+        return Results.NotFound();
+    }
+    
+    var subjectNumberExists =
+        await subjectService.SubjectNumberExistsAsync(dto.SubjectNumber);
+
+    if (subjectNumberExists)
+    {
+        return Results.BadRequest(
+            "A subject with this subject number already exists.");
+    }
+    
+    if (dto.RecruitmentStatus == "Randomised" &&
+        dto.RandomisationDate is null)
+    {
+        return Results.BadRequest(
+            "Randomisation Date is required when a subject is Randomised.");
+    }
+    
+    var newSubject = await subjectService.CreateSubjectAsync(dto);
+
+    return Results.Created(
+        $"/subjects/{newSubject.Id}",
+        new
+        {
+            newSubject.Id,
+            newSubject.SiteId,
+            newSubject.SubjectNumber,
+            newSubject.RandomisationDate,
+            newSubject.RecruitmentStatus,
+            newSubject.ScreeningDate,
+            newSubject.PreScreenDate,
+            newSubject.ScreenFailDate,
+            newSubject.ScreenFailReason
+        });
+    
+});
+
+app.MapGet("/subjects", async (SubjectService subjectService) =>
+{
+    var subjects = await subjectService.GetSubjectsAsync();
+
+    return Results.Ok(subjects);
 });
 
 app.Run();

@@ -105,3 +105,17 @@ Content-Type: application/json
 
 ###
 DELETE http://localhost:5011/sites/8
+
+###
+POST http://localhost:5011/subjects
+Content-Type: application/json
+
+{
+  "siteId": 7,
+  "subjectNumber": "1-002",
+  "recruitmentStatus": "Randomised",
+  "randomisationDate": "2026-09-20"
+}
+
+###
+GET http://localhost:5011/subjects
