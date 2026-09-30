@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using TrialTrack.Models;
 using TrialTrack.Dtos;
 using Microsoft.EntityFrameworkCore;
@@ -298,6 +299,107 @@ app.MapGet("/subjects", async (SubjectService subjectService) =>
     var subjects = await subjectService.GetSubjectsAsync();
 
     return Results.Ok(subjects);
+});
+
+app.MapGet("/subjects/{id}", async (
+    int id,
+    SubjectService subjectService) =>
+{
+    var subject = await subjectService.GetSubjectByIdAsync(id);
+
+    if (subject is null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(subject);
+});
+
+app.MapPut("/subjects/{id}", async (
+    int id,
+    UpdateSubjectDto dto,
+    SubjectService subjectService,
+    SiteService siteService
+) =>
+{
+    var subject = await subjectService.GetSubjectByIdAsync(id);
+
+    if (subject is null)
+    {
+        return Results.NotFound();
+    }
+
+    if (dto.SiteId <= 0 ||
+        string.IsNullOrWhiteSpace(dto.SubjectNumber) ||
+        string.IsNullOrWhiteSpace(dto.RecruitmentStatus))
+    {
+        return Results.BadRequest(
+            "SiteId, Subject Number and Recruitment Status are required.");
+    }
+
+    var allowedStatuses = new[]
+    {
+        "Pre-Screened",
+        "Screening",
+        "Randomised",
+        "Screen Failed",
+        "Completed",
+        "Withdrawn"
+    };
+
+    if (!allowedStatuses.Contains(dto.RecruitmentStatus))
+    {
+        return Results.BadRequest(
+            "Recruitment Status is invalid.");
+    }
+
+    var site = await siteService.GetSiteByIdAsync(dto.SiteId);
+    
+    if (site is null)
+    {
+        return Results.NotFound();
+    }
+
+    if (dto.SubjectNumber != subject.SubjectNumber)
+    {
+        var subjectNumberExists = 
+            await subjectService.SubjectNumberExistsAsync(dto.SubjectNumber);
+
+        if (subjectNumberExists)
+        {
+            return Results.BadRequest("A subject with this subject number already exists.");
+        }
+    }
+
+    if (dto.RecruitmentStatus == "Randomised" 
+        && dto.RandomisationDate is null)
+    {
+        return Results.BadRequest("Randomisation Date is required when a subject is Randomised.");
+    }
+
+    var updatedSubject = 
+        await subjectService.UpdateSubjectAsync(id, dto);
+       
+    if (updatedSubject is null)
+            {
+                return Results.NotFound();
+            }
+    
+    return Results.Ok(updatedSubject);
+});
+
+app.MapDelete("/subjects/{id}", async (
+    int id,
+    SubjectService subjectService) =>
+{
+    var deleted = await subjectService.DeleteSubjectAsync(id);
+
+    if (!deleted)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.NoContent();
 });
 
 app.Run();
