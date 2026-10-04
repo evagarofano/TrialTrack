@@ -381,11 +381,12 @@ app.MapPut("/subjects/{id}", async (
         await subjectService.UpdateSubjectAsync(id, dto);
        
     if (updatedSubject is null)
-            {
-                return Results.NotFound();
-            }
+    {
+        return Results.NotFound();
+    }
     
     return Results.Ok(updatedSubject);
+    
 });
 
 app.MapDelete("/subjects/{id}", async (
@@ -400,6 +401,24 @@ app.MapDelete("/subjects/{id}", async (
     }
 
     return Results.NoContent();
+});
+
+app.MapGet("/studies/{studyId}/recruitment-summary", async (
+    int studyId,
+    SubjectService subjectService,
+    StudyService studyService
+) =>
+{
+    var study = await studyService.GetStudyByIdAsync(studyId);
+
+    if (study is null)
+    {
+        return Results.NotFound();
+    }
+
+    var summary = await subjectService.GetRecruitmentSummaryAsync(studyId);
+
+    return Results.Ok(summary);
 });
 
 app.Run();

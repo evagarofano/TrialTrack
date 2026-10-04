@@ -89,4 +89,58 @@ public class SubjectService
         
         return true;
     }
+
+    public async Task<int> GetRandomisedSubjectCountAsync()
+    {
+        return await _db.Subjects.Where(subject => subject.RecruitmentStatus == "Randomised")
+            .CountAsync();
+    }
+    
+    public async Task<RecruitmentSummaryDto> GetRecruitmentSummaryAsync(int studyId)
+    {
+        var randomisedCount = await _db.Subjects.
+            Where(subject => subject.RecruitmentStatus == "Randomised" 
+                             && subject.Site.StudyId == studyId)
+            .CountAsync();
+        
+        var screeningCount = await _db.Subjects.
+            Where(subject => subject.RecruitmentStatus == "Screening" 
+                             && subject.Site.StudyId == studyId)
+            .CountAsync();
+        
+        var preScreenedCount = await _db.Subjects.
+            Where(subject => subject.RecruitmentStatus == "Pre-Screened" 
+                             && subject.Site.StudyId == studyId)
+            .CountAsync();
+        
+        var screenFailedCount = await _db.Subjects.
+            Where(subject => subject.RecruitmentStatus == "Screen Failed"
+                             && subject.Site.StudyId == studyId)
+            .CountAsync();
+        
+        var completedCount = await _db.Subjects.
+            Where(subject => subject.RecruitmentStatus == "Completed"
+                             && subject.Site.StudyId == studyId)
+            .CountAsync();
+        
+        var withdrawnCount = await _db.Subjects.
+            Where(subject => subject.RecruitmentStatus == "Withdrawn"
+                             && subject.Site.StudyId == studyId)
+            .CountAsync();
+        
+        var summary = new RecruitmentSummaryDto
+        {
+            RandomisedCount = randomisedCount,
+            ScreeningCount = screeningCount,
+            PreScreenedCount = preScreenedCount,
+            ScreenFailedCount = screenFailedCount,
+            CompletedCount = completedCount,
+            WithdrawnCount = withdrawnCount
+        };
+        
+        return summary;
+    }
+    
+    
+  
 }

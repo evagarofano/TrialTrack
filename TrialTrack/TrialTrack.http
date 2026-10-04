@@ -137,3 +137,9 @@ Content-Type: application/json
 
 ###
 DELETE http://localhost:5011/subjects/3
+
+###
+GET http://localhost:5011/studies/1/recruitment-summary
+
+###
+GET http://localhost:5011/studies/999999/recruitment-summary
