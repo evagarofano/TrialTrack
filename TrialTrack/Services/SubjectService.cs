@@ -128,6 +128,39 @@ public class SubjectService
                              && subject.Site.StudyId == studyId)
             .CountAsync();
         
+        var everScreenedCount = await _db.Subjects
+            .Where(subject =>
+                subject.ScreeningDate != null
+                && subject.Site.StudyId == studyId)
+            .CountAsync();
+        
+        var everRandomisedCount = await _db.Subjects
+            .Where(subject =>
+                subject.RandomisationDate != null
+                && subject.Site.StudyId == studyId)
+            .CountAsync();
+
+        decimal conversionRate;
+
+        if (everScreenedCount == 0)
+        {
+            conversionRate = 0;
+        }
+        else
+        {
+            conversionRate = (decimal)everRandomisedCount / everScreenedCount * 100;
+        }
+        
+        decimal screenFailureRate;
+        if (everScreenedCount == 0)
+        {
+            screenFailureRate = 0;
+        }
+        else
+        {
+            screenFailureRate = (decimal)screenFailedCount / everScreenedCount * 100;
+        }
+        
         var summary = new RecruitmentSummaryDto
         {
             RandomisedCount = randomisedCount,
@@ -135,7 +168,9 @@ public class SubjectService
             PreScreenedCount = preScreenedCount,
             ScreenFailedCount = screenFailedCount,
             CompletedCount = completedCount,
-            WithdrawnCount = withdrawnCount
+            WithdrawnCount = withdrawnCount,
+            ScreeningToRandomisationConversionRate = Math.Round(conversionRate, 2),
+            ScreeningToScreenFailRate = Math.Round(screenFailureRate, 2),
         };
         
         return summary;

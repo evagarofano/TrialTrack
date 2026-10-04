@@ -113,23 +113,25 @@ Content-Type: application/json
 {
   "siteId": 7,
   "subjectNumber": "1-003",
-  "recruitmentStatus": "Randomised",
-  "randomisationDate": "2026-09-30",
-  "screenFailDate": null,
-  "screenFailReason": null
+  "recruitmentStatus": "Screen Failed",
+  "randomisationDate": null,
+  "screeningDate": "2026-09-01",
+  "screenFailDate": "2026-09-05",
+  "screenFailReason": "Exc 1"
 }
 
 ###
-GET http://localhost:5011/subjects/2
+GET http://localhost:5011/subjects/
 
 ###
-PUT http://localhost:5011/subjects/2
+PUT http://localhost:5011/subjects/3
 Content-Type: application/json
 
 {
   "subjectNumber": "1-002",
   "siteId": 7,
   "recruitmentStatus": "Randomised",
+  "screeningDate": "2026-08-20",
   "randomisationDate": "2026-09-20",
   "screenFailDate": null,
   "screenFailReason": null
@@ -143,3 +145,6 @@ GET http://localhost:5011/studies/1/recruitment-summary
 
 ###
 GET http://localhost:5011/studies/999999/recruitment-summary
+
+###
+GET http://localhost:5011/subjects

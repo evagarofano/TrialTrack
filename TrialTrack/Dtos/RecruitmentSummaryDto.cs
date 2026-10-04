@@ -8,4 +8,7 @@ public class RecruitmentSummaryDto
     public int ScreenFailedCount { get; set; }
     public int CompletedCount { get; set; }
     public int WithdrawnCount { get; set; }
+    public decimal ScreeningToRandomisationConversionRate { get; set; }
+    
+    public decimal ScreeningToScreenFailRate { get; set; }
 }
