@@ -421,4 +421,23 @@ app.MapGet("/studies/{studyId}/recruitment-summary", async (
     return Results.Ok(summary);
 });
 
+app.MapGet("/studies/{studyId}/site-performance", async (
+    int studyId,
+    SiteService siteService,
+    StudyService studyService
+) =>
+{
+    var study = await studyService.GetStudyByIdAsync(studyId);
+
+    if (study is null)
+    {
+        return Results.NotFound();
+    }
+
+    var sitePerformance = await siteService.GetSitesPerformanceAsync(studyId);
+    
+    return Results.Ok(sitePerformance);
+
+});
+
 app.Run();

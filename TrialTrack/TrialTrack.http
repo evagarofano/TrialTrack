@@ -81,11 +81,12 @@ POST http://localhost:5011/sites
 Content-Type: application/json
 
 {
-  "name": "Edinburgh Research Site",
-  "location": "Edinburgh",
-  "status": "Active",
+  "name": "Manchester Research Site",
+  "location": "Manchester",
+  "status": "Recruiting",
   "studyId": 1
 }
+
 
 ###
 GET http://localhost:5011/sites
@@ -94,13 +95,14 @@ GET http://localhost:5011/sites
 GET http://localhost:5011/sites/999
 
 ###
-PUT http://localhost:5011/sites/999
+PUT http://localhost:5011/sites/
 Content-Type: application/json
 
 {
-  "name": "Glasgow Research Site",
-  "location": "Glasgow City Centre",
-  "status": "Recruiting"
+  "name": "Manchester Research Site",
+  "location": "Manchester",
+  "status": "Recruiting",
+  "studyId": 1
 }
 
 ###
@@ -124,17 +126,17 @@ Content-Type: application/json
 GET http://localhost:5011/subjects/
 
 ###
-PUT http://localhost:5011/subjects/3
+POST http://localhost:5011/subjects/
 Content-Type: application/json
 
 {
-  "subjectNumber": "1-002",
-  "siteId": 7,
-  "recruitmentStatus": "Randomised",
-  "screeningDate": "2026-08-20",
-  "randomisationDate": "2026-09-20",
-  "screenFailDate": null,
-  "screenFailReason": null
+  "subjectNumber": "9-003",
+  "siteId": 9,
+  "recruitmentStatus": "Screen Failed",
+  "screeningDate": "2026-10-05",
+  "randomisationDate": null,
+  "screenFailDate": "2026-10-08",
+  "screenFailReason": "Eligibility criteria not met"
 }
 
 ###
@@ -148,3 +150,6 @@ GET http://localhost:5011/studies/999999/recruitment-summary
 
 ###
 GET http://localhost:5011/subjects
+
+###
+GET http://localhost:5011/studies/1/site-performance

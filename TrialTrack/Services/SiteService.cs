@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TrialTrack.Services;
 
-public class SiteService
+public class SiteService 
 {
     private readonly TrialTrackDbContext _db;
 
@@ -39,7 +39,75 @@ public class SiteService
     {
         return await _db.Sites.FindAsync(id);
     }
-    
+
+    public async Task<List<SitePerformanceDto>> GetSitesPerformanceAsync(int studyId)
+    {
+        var sitesInStudy = await _db.Sites
+            .Where(site => site.StudyId == studyId)
+            .ToListAsync();
+
+        var sitePerformanceResults = new List<SitePerformanceDto>();
+
+        foreach (var site in sitesInStudy)
+        {
+            var everScreenedCount = await _db.Subjects
+                .Where(subject =>
+                    subject.ScreeningDate != null
+                    && subject.SiteId == site.Id)
+                .CountAsync();
+
+            var everRandomisedCount = await _db.Subjects
+                .Where(subject =>
+                    subject.RandomisationDate != null
+                    && subject.SiteId == site.Id)
+                .CountAsync();
+
+            var screenFailedCount = await _db.Subjects
+                .Where(subject =>
+                    subject.RecruitmentStatus == "Screen Failed"
+                    && subject.SiteId == site.Id)
+                .CountAsync();
+
+            decimal screeningToRandomisationRate;
+
+            if (everScreenedCount == 0)
+            {
+                screeningToRandomisationRate = 0;
+            }
+            else
+            {
+                screeningToRandomisationRate =
+                    (decimal)everRandomisedCount / everScreenedCount * 100;
+            }
+
+            decimal screenFailureRate;
+            if (everScreenedCount == 0)
+            {
+                screenFailureRate = 0;
+            }
+            else
+            {
+                screenFailureRate = (decimal)screenFailedCount / everScreenedCount * 100;
+            }
+
+            var sitePerformance = new SitePerformanceDto
+            {
+                SiteId = site.Id,
+                SiteName = site.Name,
+                EverScreenedCount = everScreenedCount,
+                EverRandomisedCount = everRandomisedCount,
+                ScreenFailureRate = Math.Round(screenFailureRate, 2), 
+                ScreeningToRandomisationRate = Math.Round(screeningToRandomisationRate, 2), 
+                ScreenFailedCount = screenFailedCount
+            };
+
+            sitePerformanceResults.Add(sitePerformance);
+        }
+
+        return sitePerformanceResults;
+
+    }
+
     public async Task<Site?> UpdateSiteAsync(int id, UpdateSiteDto dto)
     {
         var site = await _db.Sites.FindAsync(id);
@@ -73,5 +141,4 @@ public class SiteService
         return true;
     }
     
-    public List<Subject> Subjects { get; set; } = new();
 }
