@@ -8,5 +8,7 @@ public class Site
     public string Status { get; set; } = string.Empty;
     public int StudyId { get; set; }
     public Study Study { get; set; } = null!;
+    public int RecruitmentTarget { get; set; }
     
+    public int? MonthlyRecruitmentTarget { get; set; }
 }

@@ -34,9 +34,15 @@ namespace TrialTrack.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("MonthlyRecruitmentTarget")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RecruitmentTarget")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()

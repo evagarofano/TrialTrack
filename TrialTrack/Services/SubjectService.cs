@@ -96,8 +96,12 @@ public class SubjectService
             .CountAsync();
     }
     
+    
     public async Task<RecruitmentSummaryDto> GetRecruitmentSummaryAsync(int studyId)
     {
+        var study = await _db.Studies
+            .FirstOrDefaultAsync(s => s.Id == studyId);
+        
         var randomisedCount = await _db.Subjects.
             Where(subject => subject.RecruitmentStatus == "Randomised" 
                              && subject.Site.StudyId == studyId)
@@ -161,6 +165,17 @@ public class SubjectService
             screenFailureRate = (decimal)screenFailedCount / everScreenedCount * 100;
         }
         
+        var recruitmentTarget = await _db.Sites
+            .Where(site => site.StudyId == studyId)
+            .SumAsync(site => site.RecruitmentTarget);
+        
+        decimal recruitmentProgressPercentage = 0;
+
+        if (recruitmentTarget > 0)
+        {
+            recruitmentProgressPercentage = Math.Round((decimal)everRandomisedCount / recruitmentTarget * 100,2);
+        }
+        
         var summary = new RecruitmentSummaryDto
         {
             RandomisedCount = randomisedCount,
@@ -169,8 +184,13 @@ public class SubjectService
             ScreenFailedCount = screenFailedCount,
             CompletedCount = completedCount,
             WithdrawnCount = withdrawnCount,
-            ScreeningToRandomisationConversionRate = Math.Round(conversionRate, 2),
+            ScreeningToRandomisationConversionRate = 
+                Math.Round(conversionRate, 2),
             ScreeningToScreenFailRate = Math.Round(screenFailureRate, 2),
+            RecruitmentTarget = recruitmentTarget,
+            RecruitmentProgressPercentage = recruitmentProgressPercentage,
+            StudyId = studyId,
+            StudyName = study?.Name ?? string.Empty,
         };
         
         return summary;

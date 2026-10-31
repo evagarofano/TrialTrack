@@ -15,4 +15,9 @@ public class CreateSiteDto
     
     [Range(1, int.MaxValue)]
     public int StudyId { get; set; }
+        
+    public int RecruitmentTarget { get; set; }
+    
+    [Range(0, int.MaxValue)]
+    public int? MonthlyRecruitmentTarget { get; set; }
 }

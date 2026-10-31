@@ -92,17 +92,18 @@ Content-Type: application/json
 GET http://localhost:5011/sites
 
 ###
-GET http://localhost:5011/sites/999
+GET http://localhost:5011/sites/7
 
 ###
-PUT http://localhost:5011/sites/
+PUT http://localhost:5011/sites/7
 Content-Type: application/json
 
 {
-  "name": "Manchester Research Site",
-  "location": "Manchester",
+  "name": "Glasgow Research Site",
+  "location": "Glasgow City Centre",
   "status": "Recruiting",
-  "studyId": 1
+  "recruitmentTarget": 40,
+  "monthlyRecruitmentTarget": 5
 }
 
 ###
@@ -153,3 +154,9 @@ GET http://localhost:5011/subjects
 
 ###
 GET http://localhost:5011/studies/1/site-performance
+
+###
+GET http://localhost:5011/studies/1/site-performance
+
+###
+GET http://localhost:5011/studies/1/recruitment-summary

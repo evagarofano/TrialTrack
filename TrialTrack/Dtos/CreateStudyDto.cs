@@ -12,4 +12,5 @@ public class CreateStudyDto
 
     [Required]
     public string Status { get; set; } = string.Empty;
+
 }
